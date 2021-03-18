@@ -1,4 +1,4 @@
-package com.jackson.imagefinder.view.activity.ui
+package com.jackson.imagefinder.view.ui
 
 import android.app.Activity
 import android.graphics.Color

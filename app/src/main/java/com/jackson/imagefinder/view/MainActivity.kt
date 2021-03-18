@@ -1,4 +1,4 @@
-package com.jackson.imagefinder
+package com.jackson.imagefinder.view
 
 import android.os.Bundle
 import com.jackson.imagefinder.BaseActivity
