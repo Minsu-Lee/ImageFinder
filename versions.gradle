@@ -1,6 +1,6 @@
 ext {
     kotlinVersion = '1.4.0'
-    koinVersion = '1.0.2'
+    koinVersion = '2.2.0'
     ankoVersion = "0.10.8"
     rxjava2Version = "2.0.1"
     retrofit2Version = "2.1.0"
@@ -17,14 +17,24 @@ def lib = [:]
 def kotlin = [:]
 kotlin.plugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
 kotlin.stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+kotlin.test = "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
 lib.kotlin = kotlin
 
 /* Koin */
 def koin = [:]
 koin.core = "org.koin:koin-core:$koinVersion"
+// Koin extended & experimental features
+koin.coreExt = "org.koin:koin-core-ext:$koinVersion"
+//안드로이드 context 주입, 안드로이드 log 지원 기능을 제공
 koin.android = "org.koin:koin-android:$koinVersion"
+//LifecycleOwner 들에서 scope 생성-삭제를 자동화하는 기능을 제공
+koin.scope = "org.koin:koin-androidx-scope:$koinVersion"
+//AAC의 ViewModel 을 Actiity나 Fragment에서 손쉽게 주입받을 수 있는 기능을 제공
 koin.architecture = "org.koin:koin-androidx-viewmodel:$koinVersion"
+//테스트용 유틸리티
 koin.test = "org.koin:koin-test:$koinVersion"
+// Needed JUnit version
+koin.testJunit = "org.koin:koin-test-junit4:$koinVersion"
 lib.koin = koin
 
 /* Anko */
