@@ -12,6 +12,7 @@ data class ImageData (
 
     @SerializedName("datetime")
     var datetime: String = "",
+    // [YYYY]-[MM]-[DD]T[hh]:[mm]:[ss].000+[tz]
 
     @SerializedName("display_sitename")
     var displaySitename: String = "",

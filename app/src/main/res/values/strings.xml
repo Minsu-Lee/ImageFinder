@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">ImageFinder</string>
     <string name="back_press_str">\'뒤로\' 버튼을 한번 더 누르시면 종료됩니다.</string>
-    <string name="image_keyword_hint"></string>
+    <string name="image_keyword_hint">검색 키워드를 입력해주세요</string>
+    <string name="first_guide_str">환영합니다.\n이미지 검색을 위해 키워드를 입력해주세요.</string>
+    <string name="not_found_guide_str">죄송합니다.\n검색 결과가 없습니다.</string>
 </resources>
