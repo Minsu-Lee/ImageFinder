@@ -13,7 +13,8 @@ android {
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        // testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "nl.jovmit.roboapp.RoboTestRunner"
     }
 
     buildTypes {
@@ -29,6 +30,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
 }
 
 dependencies {
@@ -38,10 +42,13 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.3.2'
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
 
     // Koin
     implementation lib.koin.core
+    implementation lib.koin.coreExt
     implementation lib.koin.android
+    implementation lib.koin.scope
     implementation lib.koin.architecture
 
     lib.anko.libNames.each { name ->
@@ -58,8 +65,13 @@ dependencies {
     implementation lib.recyclerView.runtime
 
     testImplementation 'junit:junit:4.12'
+    // Koin
     testImplementation lib.koin.test
     testImplementation lib.koin.test, { exclude group: 'org.mockito' }
+    // testImplementation lib.koin.testJunit
+    // Mockito
+    testImplementation group: 'org.mockito', name: 'mockito-android', version: '3.3.3'
+
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
