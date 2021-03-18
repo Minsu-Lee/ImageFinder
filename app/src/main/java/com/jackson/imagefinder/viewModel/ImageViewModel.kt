@@ -1,7 +1,9 @@
 package com.jackson.imagefinder.viewModel
 
 import androidx.lifecycle.MutableLiveData
+import com.jackson.imagefinder.base.AppConst
 import com.jackson.imagefinder.base.BaseViewModel
+import com.jackson.imagefinder.base.ListItemStatus
 import com.jackson.imagefinder.base.ParamsInfo
 import com.jackson.imagefinder.extensions.getDefault
 import com.jackson.imagefinder.extensions.set
@@ -29,42 +31,61 @@ class ImageViewModel(private val service: KakaoAPIService): BaseViewModel() {
     private val _query: MutableLiveData<String> = MutableLiveData("")
     val pQuery: MutableLiveData<String>
         get() = _query
-    private val _pSort: MutableLiveData<String> = MutableLiveData("")
+    private val _pSort: MutableLiveData<String> = MutableLiveData(AppConst.SORT_ACCURACY)
     val pSort: MutableLiveData<String>
         get() = _pSort
-    private val _pPage: MutableLiveData<Int> = MutableLiveData(1)
+    private val _pPage: MutableLiveData<Int> = MutableLiveData(AppConst.PAGE_FIRST_VALUE)
     val pPage: MutableLiveData<Int>
         get() = _pPage
-    private val _pPageSize: MutableLiveData<Int> = MutableLiveData(30)
+    private val _pPageSize: MutableLiveData<Int> = MutableLiveData(AppConst.PER_PAGE_DEFAULT)
     val pPageSize: MutableLiveData<Int>
         get() = _pPageSize
 
-    fun searchRepositories(query: String = pQuery.getDefault(""), sort: String = pSort.getDefault("accuracy"), page: Int = pPage.getDefault(1), pageSize: Int = pPageSize.getDefault(30), isFirst: Boolean = false) {
-        hashMapOf<String, Any?>().apply {
+    fun itemClear() {
+        items.value = arrayListOf()
+    }
+
+    fun searchRepositories(query: String = pQuery.getDefault(""),
+                           sort: String = pSort.getDefault(AppConst.SORT_ACCURACY),
+                           page: Int = pPage.getDefault(AppConst.PAGE_FIRST_VALUE),
+                           pageSize: Int = pPageSize.getDefault(AppConst.PER_PAGE_DEFAULT)) {
+        if (query.isNotEmpty()) hashMapOf<String, Any?>().apply {
             put(ParamsInfo.KEY_SEARCH_QUERY, query)
             put(ParamsInfo.KEY_SEARCH_SORT, sort)
             put(ParamsInfo.KEY_SEARCH_PAGE, "$page")
             put(ParamsInfo.KEY_SEARCH_PAGE_SIZE, "$pageSize")
         }.let { params ->
 
-            progressStatus(isFirst, true)
+            progressStatus(true)
 
             addDisposable(service.searchImage(params)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .doOnError { progressStatus(isFirst, false) }
-                .doOnComplete { progressStatus(isFirst, false) }
                 .subscribe({
                     meta.set(it.meta ?: MetaData())
                     items.set(it.documents)
+                    progressStatus(false)
                     DLog.e(TAG, "result: ${it.documents.size}")
-                    println("result: ${it.documents.size}")
-                    progressStatus(isFirst, false)
+
+                    itemStatus.set(
+                        if (it.documents.size > 0) ListItemStatus.FULL
+                        else ListItemStatus.NOT_FOUND
+                    )
+
+                    keyboardStatus(false)
+
                 }, {
+                    progressStatus(false)
                     DLog.e(TAG, "Throwable: ${it.message}")
-                    println("Throwable: ${it.message}")
-                    progressStatus(isFirst, false)
                 }))
+
+        } else {
+
+            // 첫 가이드 화면으로 노출
+            itemStatus.set(ListItemStatus.FIRST)
+            itemClear()
+            keyboardStatus(false)
+
         }
     }
 }

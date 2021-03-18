@@ -7,6 +7,7 @@ ext {
     retrofit2Rxjava2AdapterVersion = '1.0.0'
     okhttp3Version = '3.4.2'
     recyclerviewVersion = '1.1.0'
+    glideVersion = '4.12.0'
 }
 ext.lib = [:]
 
@@ -66,5 +67,11 @@ lib.okhttp3 = okhttp3
 def recyclerView = [:]
 recyclerView.runtime = "androidx.recyclerview:recyclerview:$recyclerviewVersion"
 lib.recyclerView = recyclerView
+
+/* Glide */
+def glide = [:]
+glide.runtime = "com.github.bumptech.glide:glide:$glideVersion"
+glide.annotation = "com.github.bumptech.glide:compiler:$glideVersion"
+lib.glide = glide
 
 ext.lib = lib

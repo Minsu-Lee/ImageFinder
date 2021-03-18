@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="image_search_btn" type="id" />
+    <item name="search_image_thumb_left" type="id" />
+    <item name="search_image_thumb_center" type="id" />
+    <item name="search_image_thumb_right" type="id" />
 </resources>

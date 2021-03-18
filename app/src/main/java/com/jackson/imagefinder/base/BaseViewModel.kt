@@ -1,18 +1,24 @@
 package com.jackson.imagefinder.base
 
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.jackson.imagefinder.extensions.set
+import com.jackson.imagefinder.extensions.setPost
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import kotlinx.coroutines.CoroutineScope
 
-enum class ListItemStatus(var value: String) {
-    FIRST("FIRST"),         // 검색 전 ) 처음 상태
-    FULL("FULL"),           // 검색 후 ) 데이터가 존재하는 경우
-    EMPTY("EMPTY"),         // 검색 후 ) 검색데이터가 없는 경우
+enum class ListItemStatus(var value: String, var id: Int) {
+    FIRST("FIRST", 0),              // 검색 전 ) 처음 상태
+    FULL("FULL", 100),              // 검색 후 ) 데이터가 존재하는 경우
+    NOT_FOUND("NOT_FOUND", 200),    // 검색 후 ) 검색 데이터가 없는 경우
+    EMPTY("EMPTY", 300),            // 예외사항
 }
 
 open class BaseViewModel : ViewModel() {
+
+    var lifecycleOwner: LifecycleOwner? = null
 
     /**
      * 데이터 상태, ListItemStatus
@@ -29,8 +35,16 @@ open class BaseViewModel : ViewModel() {
     val progressStatus: MutableLiveData<Boolean>
         get() = _progressStatus
 
-    fun progressStatus(isFirst: Boolean, state: Boolean) {
-        if (!isFirst) progressStatus.set(state)
+    private val _keyboardStatus: MutableLiveData<Boolean> = MutableLiveData(false)
+    val keyboardStatus: MutableLiveData<Boolean>
+        get() = _keyboardStatus
+
+    fun progressStatus(state: Boolean) {
+        progressStatus.set(state)
+    }
+
+    fun keyboardStatus(isShow: Boolean) {
+        keyboardStatus.value = isShow
     }
 
     private val disposables: CompositeDisposable = CompositeDisposable()
