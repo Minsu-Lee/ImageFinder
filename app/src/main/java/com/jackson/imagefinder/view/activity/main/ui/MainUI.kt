@@ -134,7 +134,7 @@ class MainUI : BaseView<ImageViewModel>(), TextView.OnEditorActionListener {
                         padding = 0
                     }.lparams(width= dip(30), height= dip(30))
 
-                    setOnClickListener { vm?.searchRepositories() }
+                    setOnClickListener { vm?.onRefresh() }
 
                 }.lparams(width= dip(60), height= dip(60)) {
                     centerVertically()
@@ -205,7 +205,7 @@ class MainUI : BaseView<ImageViewModel>(), TextView.OnEditorActionListener {
 
     override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
         when (actionId) {
-            EditorInfo.IME_ACTION_SEARCH -> vm?.searchRepositories()
+            EditorInfo.IME_ACTION_SEARCH -> vm?.onRefresh()
             else -> return false // 기본 엔터키 동작
         }
         return true
