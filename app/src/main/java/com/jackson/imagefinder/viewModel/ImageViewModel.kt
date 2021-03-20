@@ -56,14 +56,19 @@ class ImageViewModel(private val service: KakaoAPIService): BaseViewModel() {
             put(ParamsInfo.KEY_SEARCH_PAGE_SIZE, "$pageSize")
         }.let { params ->
 
-            progressStatus(true)
+            progressStatus(page == 0)
+            if (page == 0) itemClear()
 
             addDisposable(service.searchImage(params)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                     meta.set(it.meta ?: MetaData())
-                    items.set(it.documents)
+                    with(items) {
+                        value?.addAll(it.documents)
+                        // addAll 호출만으로 구독에 반영이 없어 재초기화
+                        value = value
+                    }
                     progressStatus(false)
                     DLog.e(TAG, "result: ${it.documents.size}")
 
@@ -78,13 +83,6 @@ class ImageViewModel(private val service: KakaoAPIService): BaseViewModel() {
                     progressStatus(false)
                     DLog.e(TAG, "Throwable: ${it.message}")
                 }))
-
-        } else {
-
-            // 첫 가이드 화면으로 노출
-            itemStatus.set(ListItemStatus.FIRST)
-            itemClear()
-            keyboardStatus(false)
 
         }
     }

@@ -1,8 +1,6 @@
 package com.jackson.imagefinder.view.adapter
 
 import android.view.ViewGroup
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.jackson.imagefinder.base.ListItemStatus
 import com.jackson.imagefinder.extensions.getDefault
@@ -17,71 +15,49 @@ import com.jackson.imagefinder.view.adapter.ui.ImageItemUI
 import com.jackson.imagefinder.view.adapter.ui.NotFoundGuideUI
 import com.jackson.imagefinder.viewModel.ImageViewModel
 
-class ImageListAdapter(owner: LifecycleOwner, var viewModel: ImageViewModel): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ImageListAdapter(var viewModel: ImageViewModel): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
-        const val TAG = "ImageListAdapter"
-        const val TYPE_FIRST_GUIDE_CARD = 0
-        const val TYPE_ITEM_CARD = 100
-        const val TYPE_NOT_FOUND_CARD = 200
-        const val TYPE_EMPTY_CARD = 300
+        val TAG = ImageListAdapter::class.java.simpleName
     }
 
+    // View 에서 Adapter의 갱신 종류를 판단하기 위해서 API 호출 전 items size 저장
     var beforeSize: Int = 0
-
-    init {
-        viewModel.items.observe(owner, Observer {
-            if (beforeSize < it.size){
-                beforeSize = it.size
-                notifyItemRangeInserted(beforeSize, it.size)
-            } else {
-                beforeSize = it.size
-                notifyDataSetChanged()
-                DLog.e(TAG, "TESTSTESTETSES")
-            }
-        })
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when(viewType) {
-            TYPE_FIRST_GUIDE_CARD -> ImageGuideViewHolder(parent, ImageGuideUI())
-            TYPE_ITEM_CARD -> ImageItemViewHolder(parent, ImageItemUI())
-            TYPE_NOT_FOUND_CARD -> NotFoundGuideViewHolder(parent, NotFoundGuideUI())
-            else -> EmptyItemViewHolder(parent, EmptyItemUI())
+            ListItemStatus.FIRST.id -> ImageGuideViewHolder(parent, ImageGuideUI())
+            ListItemStatus.FULL.id -> ImageItemViewHolder(parent, ImageItemUI())
+            ListItemStatus.NOT_FOUND.id -> NotFoundGuideViewHolder(parent, NotFoundGuideUI())
+            else -> EmptyItemViewHolder(parent, EmptyItemUI()) // 예상밖의 예외를 대비하기 위해 비어있는 Holder를 반환하고 있음.
         }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (getItemViewType(position)) {
-            TYPE_FIRST_GUIDE_CARD -> DLog.e(TAG, "TYPE_FIRST_GUIDE_CARD")
-            TYPE_ITEM_CARD -> {
-                holder as ImageItemViewHolder
-                holder.onBind(viewModel.items.value ?: arrayListOf(), position)
+            ListItemStatus.FIRST.id -> DLog.i(TAG, "TYPE_FIRST_GUIDE_CARD")
+            ListItemStatus.FULL.id -> with(holder as ImageItemViewHolder) {
+                onBind(viewModel.items.value ?: arrayListOf(), position)
+                DLog.i(TAG, "TYPE_ITEM_CARD")
             }
-            TYPE_NOT_FOUND_CARD -> DLog.e(TAG, "TYPE_NOT_FOUND_CARD")
-            else -> DLog.e(TAG, "TYPE_EMPTY_CARD")
+            ListItemStatus.NOT_FOUND.id -> DLog.i(TAG, "TYPE_NOT_FOUND_CARD")
+            else -> DLog.i(TAG, "TYPE_EMPTY_CARD")
         }
     }
 
-    override fun getItemViewType(position: Int): Int {
+    override fun getItemViewType(position: Int): Int = with(viewModel) {
         var size = realItemSize()
-        viewModel.itemStatus.getDefault(ListItemStatus.FIRST).let {
+        itemStatus.getDefault(ListItemStatus.FIRST).let {
             return when {
-                size == 0 && it == ListItemStatus.FIRST -> TYPE_FIRST_GUIDE_CARD
-                size == 0 && it == ListItemStatus.NOT_FOUND -> TYPE_NOT_FOUND_CARD
-                size > 1 && it == ListItemStatus.FULL && position in 0 until itemCount -> TYPE_ITEM_CARD
-                else -> TYPE_EMPTY_CARD
+                size == 0 && it == ListItemStatus.FIRST -> ListItemStatus.FIRST.id
+                size == 0 && it == ListItemStatus.NOT_FOUND -> ListItemStatus.NOT_FOUND.id
+                size > 1 && it == ListItemStatus.FULL && position in 0 until itemCount -> ListItemStatus.FULL.id
+                else -> ListItemStatus.EMPTY.id
             }
         }
     }
 
-    override fun getItemCount(): Int {
-        var size = realItemSize()
-        return when {
-            size > 0 -> size
-            else -> 1
-        }
-    }
+    override fun getItemCount(): Int = realItemSize().let { size -> if (size > 0) size else 1 }
 
     private fun realItemSize(): Int = viewModel.items.value?.size ?: 0
 
