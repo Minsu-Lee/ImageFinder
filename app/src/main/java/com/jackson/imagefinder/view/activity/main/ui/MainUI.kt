@@ -14,6 +14,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.jackson.imagefinder.R
 import com.jackson.imagefinder.base.AppConst
 import com.jackson.imagefinder.base.BaseView
@@ -42,6 +43,8 @@ class MainUI : BaseView<ImageViewModel>(), TextView.OnEditorActionListener {
     lateinit var mSearchEt: EditText
 
     lateinit var mSearchBtn: LinearLayout
+
+    lateinit var refreshLayout: SwipeRefreshLayout
 
     lateinit var rv: RecyclerView
 
@@ -140,55 +143,63 @@ class MainUI : BaseView<ImageViewModel>(), TextView.OnEditorActionListener {
 
             }.lparams(width= matchParent, height= wrapContent)
 
-            rv = recyclerView {
-                backgroundColor = Color.WHITE
+            refreshLayout = swipeRefreshLayout {
 
-                addItemDecoration(DefaultDividerItemDecoration(ctx, DividerItemDecoration.VERTICAL, R.drawable.divider))
-                layoutManager = GridLayoutManager(ctx, 3).apply {
-                    spanSizeLookup = object: GridLayoutManager.SpanSizeLookup() {
-                        override fun getSpanSize(position: Int): Int {
-                            return vm?.itemStatus?.getDefault(ListItemStatus.FIRST)?.let {
-                                when(it) {
-                                    ListItemStatus.FULL -> 1
-                                    else -> 3
-                                }
-                            } ?: 3
+                // refreshListener 추가
+                vm?.let { setOnRefreshListener(it) }
+
+                rv = recyclerView {
+                    backgroundColor = Color.WHITE
+
+                    addItemDecoration(DefaultDividerItemDecoration(ctx, DividerItemDecoration.VERTICAL, R.drawable.divider))
+                    layoutManager = GridLayoutManager(ctx, 3).apply {
+                        spanSizeLookup = object: GridLayoutManager.SpanSizeLookup() {
+                            override fun getSpanSize(position: Int): Int {
+                                return vm?.itemStatus?.getDefault(ListItemStatus.FIRST)?.let {
+                                    when(it) {
+                                        ListItemStatus.FULL -> 1
+                                        else -> 3
+                                    }
+                                } ?: 3
+                            }
                         }
                     }
-                }
 
-                // Adapter 초기화
-                adapter = initAdapter()
+                    // Adapter 초기화
+                    adapter = initAdapter()
 
-                // ViewModel의 items를 구독합니다.
-                initItemSubscribe {
+                    // ViewModel의 items를 구독합니다.
+                    initItemSubscribe {
 
-                    /**
-                     * api가 호출되면 응답을 받기전까지 loading status로 여러번 호출하지 않도록 막고있음.
-                     * items에 변화가 있다는건 API호출로 부터 응답을 받았다는걸로 판단,
-                     * loading status를 true로 초기화 한다.
-                     */
-                    if (mImageAdapter.beforeSize != it.size) scrollListener?.loadingStatus(true)
+                        /**
+                         * api가 호출되면 응답을 받기전까지 loading status로 여러번 호출하지 않도록 막고있음.
+                         * items에 변화가 있다는건 API호출로 부터 응답을 받았다는걸로 판단,
+                         * loading status를 true로 초기화 한다.
+                         */
+                        if (mImageAdapter.beforeSize != it.size) scrollListener?.loadingStatus(true)
 
-                    if (it.size == 0) clearScrollListener()
-                    else if (it.size == AppConst.PER_PAGE_DEFAULT && scrollListener == null) {
-                        initListScrollListener()
-                    } else if (it.size == 0) scrollListener?.let { listener -> removeOnScrollListener(listener) }
+                        if (it.size == 0) clearScrollListener()
+                        else if (it.size == AppConst.PER_PAGE_DEFAULT && scrollListener == null) {
+                            initListScrollListener()
+                        } else if (it.size == 0) scrollListener?.let { listener -> removeOnScrollListener(listener) }
 
-                    // 리스트 갱신
-                    with(mImageAdapter) {
-                        if (beforeSize < it.size) {
-                            beforeSize = it.size
-                            notifyItemRangeInserted(beforeSize, it.size)
-                        } else {
-                            beforeSize = it.size
-                            notifyDataSetChanged()
+                        // 리스트 갱신
+                        with(mImageAdapter) {
+                            if (beforeSize < it.size) {
+                                beforeSize = it.size
+                                notifyItemRangeInserted(beforeSize, it.size)
+                            } else {
+                                beforeSize = it.size
+                                notifyDataSetChanged()
+                            }
                         }
+
+                        refreshLayout.isRefreshing = false
                     }
-                }
+
+                }.lparams(width= matchParent, height= matchParent)
 
             }.lparams(width= matchParent, height=0, weight = 1f)
-
         }
     }
 

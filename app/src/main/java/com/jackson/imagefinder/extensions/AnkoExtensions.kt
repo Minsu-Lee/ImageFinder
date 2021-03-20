@@ -8,6 +8,7 @@ import android.widget.EditText
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.jackson.imagefinder.utils.DLog
 import com.jackson.imagefinder.utils.DeviceUtils
 import com.jackson.imagefinder.view.component.SquareImageView
@@ -28,6 +29,13 @@ inline fun ViewManager.squareImageView() = squareImageView {}
 inline fun ViewManager.squareImageView(init: SquareImageView.() -> Unit): SquareImageView {
     return ankoView({ SquareImageView(it) }, theme= 0, init= init)
 }
+
+inline fun ViewManager.swipeRefreshLayout() = swipeRefreshLayout {}
+inline fun ViewManager.swipeRefreshLayout(init: SwipeRefreshLayout.() -> Unit): SwipeRefreshLayout {
+    return ankoView({ SwipeRefreshLayout(it) }, theme= 0, init= init)
+}
+
+
 
 /**
  * 양방향 데이터바인딩을 위해 아래와 같이 LiveData를 사용

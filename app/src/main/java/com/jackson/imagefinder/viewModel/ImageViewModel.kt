@@ -1,6 +1,7 @@
 package com.jackson.imagefinder.viewModel
 
 import androidx.lifecycle.MutableLiveData
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.jackson.imagefinder.base.AppConst
 import com.jackson.imagefinder.base.BaseViewModel
 import com.jackson.imagefinder.base.ListItemStatus
@@ -14,7 +15,8 @@ import com.jackson.imagefinder.utils.DLog
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
-class ImageViewModel(private val service: KakaoAPIService): BaseViewModel() {
+class ImageViewModel(private val service: KakaoAPIService): BaseViewModel(),
+    SwipeRefreshLayout.OnRefreshListener {
 
     companion object {
         val TAG = javaClass.simpleName
@@ -86,4 +88,11 @@ class ImageViewModel(private val service: KakaoAPIService): BaseViewModel() {
 
         }
     }
+
+    override fun onRefresh() {
+        pPage.value = AppConst.PAGE_FIRST_VALUE
+        itemClear()
+        searchRepositories()
+    }
+
 }
