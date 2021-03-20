@@ -1,10 +1,9 @@
-package com.jackson.imagefinder.view
+package com.jackson.imagefinder.view.activity.main
 
 import android.os.Bundle
 import com.jackson.imagefinder.BaseActivity
 import com.jackson.imagefinder.R
-import com.jackson.imagefinder.view.adapter.ImageListAdapter
-import com.jackson.imagefinder.view.ui.MainUI
+import com.jackson.imagefinder.view.activity.main.ui.MainUI
 import com.jackson.imagefinder.viewModel.ImageViewModel
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 
@@ -16,9 +15,6 @@ class MainActivity: BaseActivity<MainUI, ImageViewModel>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         overridePendingTransition(R.anim.stay, R.anim.stay)
-        with(view) {
-            rv.adapter = ImageListAdapter(this@MainActivity, viewModel)
-        }
     }
 
 }

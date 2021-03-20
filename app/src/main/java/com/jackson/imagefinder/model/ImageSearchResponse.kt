@@ -11,6 +11,12 @@ data class ImageSearchResponse(
     var documents: ArrayList<ImageData> = arrayListOf(),
 
     @SerializedName("meta")
-    var meta: MetaData? = null
+    var meta: MetaData? = null,
+
+    @SerializedName("errorType")
+    var errorType: String? = null,
+
+    @SerializedName("message")
+    var message: String? = null
 
 ): Parcelable

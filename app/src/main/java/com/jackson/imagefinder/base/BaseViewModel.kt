@@ -4,10 +4,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.jackson.imagefinder.extensions.set
-import com.jackson.imagefinder.extensions.setPost
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import kotlinx.coroutines.CoroutineScope
 
 enum class ListItemStatus(var value: String, var id: Int) {
     FIRST("FIRST", 0),              // 검색 전 ) 처음 상태
@@ -39,10 +37,12 @@ open class BaseViewModel : ViewModel() {
     val keyboardStatus: MutableLiveData<Boolean>
         get() = _keyboardStatus
 
+    // progress 노출 여부 제어
     fun progressStatus(state: Boolean) {
         progressStatus.set(state)
     }
 
+    // keyboard 노출 여부 제어
     fun keyboardStatus(isShow: Boolean) {
         keyboardStatus.value = isShow
     }

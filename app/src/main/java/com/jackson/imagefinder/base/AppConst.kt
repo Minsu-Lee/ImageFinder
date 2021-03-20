@@ -9,4 +9,7 @@ object AppConst {
     val SORT_ACCURACY = "accuracy"  // 정확도순
     val SORT_RECENCY = "recency"    // 최신순
 
+    // Intent 이동 시, 데이터 Key
+    val IMAGE_DATA_NAME = "IMAGE_DATA_NAME"
+
 }
