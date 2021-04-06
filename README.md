@@ -1,2 +1,2 @@
-# ImageFinder
+# ImageFinder - 
 다음 API를 활용하여 검색한 키워드에 맞는 이미지 리스트 결과를 반환하는 예제
